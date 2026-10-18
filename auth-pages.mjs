@@ -1,4 +1,4 @@
-import * as auth from './auth-client.mjs?v=mail-20261018-4';
+import * as auth from './auth-client.mjs?v=guest-voice-20261018-1';
 import {profileQuestions,readProfile,formatNames,focusNames,answerNames,challengeNames} from './profile-fields.mjs?v=mail-20261018-4';
 import {validateProfile} from './learning-profile.mjs?v=mail-20261018-4';
 
