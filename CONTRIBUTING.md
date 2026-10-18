@@ -4,4 +4,4 @@ Keep all product UI in English. Preserve existing localStorage data when changin
 
 For each pull request, explain the user problem, the changed behavior, verification performed, and any limitations. Include desktop/mobile screenshots for visual changes. Coordinate before changing storage or deployment.
 
-Design baseline: warm cream backgrounds, dark green text, honey yellow primary actions. Keep text contrast readable and visible keyboard focus. Test text at 200% zoom and narrow screens. Avoid using color alone for status.
+Design baseline: warm off-white canvas, navy ink, calm teal learning states and terracotta primary actions. Use the JKSpeak speech-wave mark; the user-provided character is a supporting study companion. Preserve the legacy storage keys for existing data. See docs/JKSpeak-Update-Audit.md for colour tokens. Keep text contrast readable and visible keyboard focus. Test text at 200% zoom and narrow screens. Avoid using color alone for status.

@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>JKSpeak</title>
-<link rel="icon" href="bee.svg" type="image/svg+xml">
-<link rel="stylesheet" href="auth.css">
+<link rel="icon" href="./jkspeak-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./auth.css?v=mail-20261018-4">
 <style>
   .splash{background:var(--hair);display:grid;grid-template-rows:1fr auto;place-items:center;
     padding:32px 24px 56px;text-align:center}
@@ -16,8 +16,8 @@
     border-radius:999px;padding:10px 26px;text-decoration:none}
 </style>
 </head>
-<body class="app">
-<main class="screen splash">
+<body class="app" data-auth-page="splash">
+<a class="skip" href="#main">Skip to content</a><main id="main" tabindex="-1" class="screen splash">
     <svg class="scenery" viewBox="0 0 480 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <g fill="#ffa26e">
         <circle cx="60" cy="150" r="60"/><circle cx="130" cy="130" r="55"/><circle cx="190" cy="160" r="45"/><rect x="0" y="150" width="235" height="55" rx="27"/>
@@ -33,7 +33,7 @@
       </g>
     </svg>
   <div class="avatar-wrap">
-    <img class="avatar" src="avatar.png" alt="">
+    <img class="avatar" src="./avatar.png" alt="">
     <p class="bubble">Welcome!</p>
   </div>
   <div>
@@ -41,9 +41,7 @@
     <a class="pill" href="welcome.html">Get started</a>
   </div>
 </main>
-<script>
-  // Move on to the welcome page after a short pause (the button skips the wait).
-  setTimeout(() => location.replace('welcome.html'), 2500);
-</script>
+
+<script type="module" src="./auth-pages.mjs?v=mail-20261018-4"></script>
 </body>
 </html>
