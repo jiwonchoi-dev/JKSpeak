@@ -10,7 +10,7 @@ Python 3 is the only runtime dependency. From this checkout:
 python3 scripts/serve.py --port 8080
 ```
 
-The server binds to `127.0.0.1` by default and serves only public app assets, including the bundled PDF.js modules. No build or package installation is required. Actual signup/login requires a configured Supabase project and the SQL migration. The committed public configuration is intentionally empty; account forms stay disabled until connected. See [account onboarding setup](docs/Account-Onboarding.md). Microphone features need localhost or HTTPS and browser permission. Hosting this elsewhere requires a separate deployment workflow.
+The server binds to `127.0.0.1` by default and serves only public app assets, including the bundled PDF.js modules. No build or package installation is required. Actual signup/login requires a configured Supabase project and the SQL migration. The public project URL and publishable key are configured; the project SQL, Auth redirect settings and actual email delivery still require verification. Account forms remain disabled if public configuration is absent. See [account onboarding setup](docs/Account-Onboarding.md). Microphone features need localhost or HTTPS and browser permission. Hosting this elsewhere requires a separate deployment workflow.
 
 ## Entry and accounts
 
