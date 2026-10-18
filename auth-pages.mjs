@@ -82,6 +82,11 @@ function verificationButton(){
 
 async function init(){
  if(kind==='privacy')return;
+ // The public welcome flow must work offline and without a Supabase account.
+ if(kind==='splash'||kind==='welcome'){
+  try{if(await auth.account())await signedIn();}catch{/* Guests can still continue. */}
+  return;
+ }
  let config;try{config=await auth.authConfig();}catch(error){say(error.message,true);const retry=document.createElement('button');retry.type='button';retry.className='btn';retry.textContent='Try connecting again';retry.onclick=()=>location.reload();$('#status').after(retry);return;}
  if(!config.configured){say('Secure account sign-in is not connected yet. Account creation and login are unavailable until the site owner completes the connection.');return;}
  // Bind login/recovery before checking callbacks: stale links or sessions cannot lock out the form.
