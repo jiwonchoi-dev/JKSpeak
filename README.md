@@ -10,7 +10,7 @@ Python 3 is the only runtime dependency. From this checkout:
 python3 scripts/serve.py --port 8080
 ```
 
-The server binds to `127.0.0.1` by default and serves only public app assets, including the bundled PDF.js modules. No build or package installation is required. Actual signup/login requires a configured Supabase project and the SQL migration. The public project URL and publishable key are configured; the project SQL, Auth redirect settings and actual email delivery still require verification. Account forms remain disabled if public configuration is absent. See [account onboarding setup](docs/Account-Onboarding.md). Microphone features need localhost or HTTPS and browser permission. Hosting this elsewhere requires a separate deployment workflow.
+The server binds to `127.0.0.1` by default and serves only public app assets, including the bundled PDF.js modules. No build or package installation is required. Actual signup/login requires a configured Supabase project and the SQL migration. The public project URL and publishable key are configured. The owner confirmed SQL/Auth redirect setup; provider health, email-confirmation settings and anonymous profile access denial were checked. Actual confirmation/recovery email delivery and first-account use still need a real-user check. Account forms remain disabled if public configuration is absent. See [account onboarding setup](docs/Account-Onboarding.md). Microphone features need localhost or HTTPS and browser permission. Hosting this elsewhere requires a separate deployment workflow.
 
 ## Entry and accounts
 
@@ -67,4 +67,4 @@ The test defaults to `/usr/bin/chromium`; set `CHROMIUM_PATH` for another instal
 
 Before release, also check keyboard navigation, 200% zoom, PDF extraction, real microphone playback/deletion, transcription errors and Safari/Firefox. Do not commit recordings, study data or credentials. Source changes do not automatically update the hosted deployment. See CONTRIBUTING.md for collaboration requirements.
 
-The auth browser tests use intercepted provider responses and synthetic credentials. SQL/RLS tests run real PostgreSQL in an isolated Docker container. Neither proves live Supabase email delivery or a configured production deployment. Complete the real-project checklist before merging account gating into the live branch.
+The auth browser tests use intercepted provider responses and synthetic credentials. SQL/RLS tests run real PostgreSQL in an isolated Docker container. Neither proves live Supabase email delivery or a configured production deployment. Keep first-account and real email-delivery checks distinct from provider configuration and mock-flow validation.
