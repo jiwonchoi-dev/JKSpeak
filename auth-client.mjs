@@ -1,4 +1,4 @@
-import {validateProfile} from './learning-profile.mjs?v=flow-20261018-3';
+import {validateProfile} from './learning-profile.mjs?v=mail-20261018-4';
 
 const sessionKey='jkspeak-auth-session-v1';
 let configPromise;
@@ -31,6 +31,17 @@ function storeSession(data){
   sessionStorage.setItem(sessionKey,JSON.stringify(session));return session;
 }
 
+// Do not expose provider messages, which can contain personal data or SMTP details.
+// Keep actionable, documented mail failures distinct from connection failures.
+function providerError(status,code,mailRequest){
+  if(code==='email_address_not_authorized')return 'Email delivery is restricted by the project’s mail service. The site owner needs to configure Custom SMTP for other recipients.';
+  if(code==='over_email_send_rate_limit')return 'The project’s email sending limit has been reached. Please wait; requesting more emails will not help until the limit resets.';
+  if(code==='over_request_rate_limit'||status===429)return 'Too many requests. Please wait before trying again.';
+  if(code==='email_address_invalid')return 'Check that your email address is correct.';
+  if(mailRequest&&status>=500)return 'The account service could not send the email. The site owner needs to check Auth logs and SMTP settings before you retry.';
+  return status===401?'Your session expired. Please log in again.':'The account service could not complete this request. Please try again.';
+}
+
 async function request(path,{method='GET',body,token,headers={}}={}){
   const config=await authConfig();
   if(!config.configured)throw new Error('Account sign-in is not connected yet. Please check back after the site owner connects Supabase.');
@@ -38,7 +49,13 @@ async function request(path,{method='GET',body,token,headers={}}={}){
   try{response=await fetch(config.url+path,{method,signal:controller.signal,headers:{apikey:config.key,...(body?{'Content-Type':'application/json'}:{}),...(token?{Authorization:`Bearer ${token}`} : {}),...headers},...(body?{body:JSON.stringify(body)}:{})});}
   catch(cause){throw new Error(cause.name==='AbortError'?'The account service took too long to respond. Please try again.':'Could not reach the account service. Your details have not been cleared; please try again.');}finally{clearTimeout(timeout);}
   const data=await response.json().catch(()=>null);
-  if(!response.ok){const error=new Error(response.status===429?'Too many attempts. Please wait before trying again.':response.status===401?'Your session expired. Please log in again.':'The account service could not complete this request. Please try again.');error.status=response.status;error.code=data?.error_code||(typeof data?.code==='string'?data.code:'');throw error;}
+  if(!response.ok){
+    const code=data?.error_code||(typeof data?.code==='string'?data.code:'');
+    const mailRequest=/^\/auth\/v1\/(signup|resend|recover)(\?|$)/.test(path);
+    const safeCode=/^[a-z][a-z0-9_]{0,63}$/.test(code)?code:'';
+    const error=new Error(providerError(response.status,code,mailRequest)+(mailRequest?` (HTTP ${response.status}${safeCode?'; '+safeCode:''})`:''));
+    error.status=response.status;error.code=code;throw error;
+  }
   return data;
 }
 

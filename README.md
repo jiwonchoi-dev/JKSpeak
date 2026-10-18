@@ -71,4 +71,4 @@ Before release, also check keyboard navigation, 200% zoom, PDF extraction, real 
 
 The auth browser tests use intercepted provider responses and synthetic credentials. SQL/RLS tests run real PostgreSQL in an isolated Docker container. Neither proves live Supabase email delivery or a configured production deployment. Keep first-account and real email-delivery checks distinct from provider configuration and mock-flow validation.
 
-Entry scripts/styles carry an `flow-20261018-3` URL version to prevent browsers reusing the pre-account app bundle after this rollout. Bump the entry asset version when changing those bundles in a later release.
+Entry scripts/styles carry an `mail-20261018-4` URL version to prevent browsers reusing the pre-account app bundle after this rollout. Bump the entry asset version when changing those bundles in a later release.

@@ -1,6 +1,6 @@
-import * as auth from './auth-client.mjs?v=flow-20261018-3';
-import {profileQuestions,readProfile,formatNames,focusNames,answerNames,challengeNames} from './profile-fields.mjs?v=flow-20261018-3';
-import {validateProfile} from './learning-profile.mjs?v=flow-20261018-3';
+import * as auth from './auth-client.mjs?v=mail-20261018-4';
+import {profileQuestions,readProfile,formatNames,focusNames,answerNames,challengeNames} from './profile-fields.mjs?v=mail-20261018-4';
+import {validateProfile} from './learning-profile.mjs?v=mail-20261018-4';
 
 const $=selector=>document.querySelector(selector);
 const kind=document.body.dataset.authPage;
@@ -65,8 +65,10 @@ function wizard(existing={},email=''){
 
 function setupLogin(){const form=$('#login-form');unlock(form);form.onsubmit=event=>{event.preventDefault();const email=form.elements.email.value,password=form.elements.password.value;action(form,async()=>{await auth.login(email,password);form.elements.password.value='';await signedIn();});};}
 function setupResend(){
- const form=$('#resend-form');if(!form)return;unlock(form);const email=pendingEmail();if(email){form.elements.email.value=email;$('#pending-email').textContent=email;}
- form.onsubmit=async event=>{event.preventDefault();const value=form.elements.email.value;const success=await action(form,async()=>{await auth.resendConfirmation(value);sessionStorage.setItem(pendingEmailKey,JSON.stringify({email:value.trim(),requestedAt:Date.now()}));say('If confirmation is needed, a new email has been requested. Use the latest message, or try logging in if you already confirmed.');});
+ const form=$('#resend-form');if(!form)return;const submit=form.querySelector('button');form.append($('#status'));unlock(form);const email=pendingEmail();if(email){form.elements.email.value=email;$('#pending-email').textContent=email;}
+ form.onsubmit=async event=>{event.preventDefault();const value=form.elements.email.value;submit.textContent='Requesting confirmation email…';const success=await action(form,async()=>{await auth.resendConfirmation(value);sessionStorage.setItem(pendingEmailKey,JSON.stringify({email:value.trim(),requestedAt:Date.now()}));say('The account service accepted the request; this does not confirm email delivery. If confirmation is needed, use the latest message. If nothing arrives, contact the site owner to check mail delivery. If already confirmed, try logging in.');});
+  $('#status').scrollIntoView({block:'nearest',behavior:'smooth'});
+  if(!success)submit.textContent='Send a new confirmation email';
   if(success){const button=form.querySelector('button');button.disabled=true;let seconds=60;const interval=setInterval(()=>{seconds--;button.textContent=seconds?`Request again in ${seconds}s`:'Send a new confirmation email';if(!seconds){clearInterval(interval);button.disabled=false;}},1000);button.textContent='Request again in 60s';}
  };
  if(new URLSearchParams(location.search).get('mode')==='help')$('.email-help').open=true;
