@@ -142,7 +142,8 @@ export async function resendConfirmation(email){
 
 // Guest access is local-only. It never assumes a Supabase account or uploads practice.
 export async function requireAccount({allowGuest=false}={}){
-  const user=await account();
+  let user;
+  try{user=await account();}catch(error){if(!allowGuest)throw error;user=null;}
   if(!user){
     if(allowGuest)return {guest:true,user:{id:'guest-local'},profile:{
       version:1,displayName:'Guest',course:'My subject',examFormat:'oral',
