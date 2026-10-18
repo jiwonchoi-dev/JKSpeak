@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in · JKSpeak</title>
+<link rel="icon" href="bee.svg" type="image/svg+xml">
+<style>
+  :root{
+    --paper:#f7f5ed; --cream:#fffefa; --ink:#30372b; --green:#52684c;
+    --soft:#e6ebdc; --line:#e2e2d5; --field:#9a9c8c;
+    --hair:#fd6d29; --hair-dark:#ec5d1b; --hair-text:#1a1d16;
+    --focus:#1f4f8a; --serif:Georgia,'Times New Roman',serif;
+    --sans:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+
+    /* Type scale (desktop) */
+    --fs-title:56px;   --lh-title:1.1;
+    --fs-section:34px; --lh-section:1.2;
+    --fs-card:24px;    --lh-card:1.3;
+    --fs-body:17px;    --lh-body:1.5;
+    --fs-caption:14px; --lh-caption:1.4;
+    --fs-button:16px;
+    --fs-input:17px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px 16px;
+    background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:var(--fs-body);line-height:var(--lh-body);font-weight:400;
+    -webkit-text-size-adjust:100%;text-size-adjust:100%}
+  .skip{position:absolute;left:-9999px}
+  .skip:focus{left:16px;top:16px;background:var(--cream);padding:8px 12px;border-radius:8px}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+  p{margin:0}
+
+  .card{width:100%;max-width:1000px;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:48px;
+    background:var(--cream);border:1px solid var(--line);border-radius:28px;padding:48px;
+    box-shadow:0 20px 50px rgba(48,55,43,.10)}
+
+  /* Left: avatar + welcome */
+  .intro{text-align:center}
+  .avatar-wrap{position:relative;width:min(240px,100%);margin:28px auto 28px}
+  .avatar{width:100%;aspect-ratio:1;border-radius:50%;border:3px solid var(--ink);
+    box-shadow:0 0 0 6px var(--soft),0 0 0 8px var(--green);object-fit:cover;display:block}
+  .bubble{position:absolute;top:-22px;right:-34px;background:#fff;color:var(--ink);
+    border:2px solid var(--ink);border-radius:16px;padding:6px 14px;
+    font-size:var(--fs-button);font-weight:600;line-height:1.3;white-space:nowrap;
+    box-shadow:0 4px 0 rgba(48,55,43,.12)}
+  .bubble::after{content:"";position:absolute;left:18px;bottom:-9px;width:14px;height:14px;background:#fff;
+    border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg)}
+  h1{font-family:var(--serif);font-size:var(--fs-title);line-height:var(--lh-title);font-weight:700;margin:0;letter-spacing:-.01em}
+  .tagline{margin:8px 0 12px;font-size:var(--fs-card);line-height:var(--lh-card);font-weight:600;color:var(--green)}
+  .welcome{margin:0 auto;max-width:36ch}
+
+  /* Right: login */
+  .panel{max-width:400px;width:100%;margin:0 auto}
+  h2{font-size:var(--fs-section);line-height:var(--lh-section);font-weight:600;margin:0 0 20px;letter-spacing:-.01em}
+  form{display:grid;gap:14px}
+  label{font-weight:600;display:block;margin-bottom:4px}
+  input{width:100%;font-family:inherit;font-size:var(--fs-input);line-height:1.4;padding:10px 12px;
+    border:2px solid var(--field);border-radius:10px;background:#fff;color:var(--ink)}
+  input:focus-visible{border-color:var(--focus)}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .row label{margin:0}
+  a,.link{color:var(--green);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+  .link{background:none;border:0;padding:0;font-family:inherit;font-size:inherit;line-height:inherit;cursor:pointer}
+  .caption{font-size:var(--fs-caption);line-height:var(--lh-caption);font-weight:400}
+  .link.caption{font-weight:600}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:inherit;
+    font-size:var(--fs-button);font-weight:600;line-height:1.25;
+    padding:12px 14px;border-radius:12px;cursor:pointer;border:2px solid var(--ink);background:transparent;color:var(--ink)}
+  .btn-primary{background:var(--hair);color:var(--hair-text);border-color:var(--hair-dark);margin-top:4px}
+  .btn-primary:hover{background:var(--hair-dark)}
+  .btn-social{border-color:var(--line);background:#fff}
+  .btn-social:hover{border-color:var(--field);background:var(--paper)}
+  .btn svg{width:20px;height:20px;flex:none}
+
+  .or{display:flex;align-items:center;gap:12px;margin:20px 0 12px}
+  .or::before,.or::after{content:"";flex:1;border-top:1px solid var(--line)}
+  .social{display:grid;gap:10px}
+
+  .status{margin:14px 0 0;padding:10px 12px;border-radius:10px;background:var(--soft);border-left:4px solid var(--green);font-weight:600}
+  .status:empty{display:none}
+  .signup{margin:18px 0 0;text-align:center}
+
+  /* Gentle motion: slow float for the avatar, one soft pop-in for the greeting */
+  @media (prefers-reduced-motion:no-preference){
+    .avatar{animation:float 5s ease-in-out infinite}
+    .bubble{animation:pop .5s .4s ease-out both, sway 5s 1s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-6px) rotate(-1.5deg)}}
+    @keyframes pop{from{opacity:0;transform:scale(.6) translateY(6px)}to{opacity:1;transform:none}}
+    @keyframes sway{0%,100%{rotate:0deg}50%{rotate:3deg}}
+  }
+
+  /* Compact layout + mobile type scale */
+  @media (max-width:760px){
+    :root{
+      --fs-title:36px; --fs-section:26px; --fs-card:20px;
+      --fs-body:16px; --fs-caption:13px; --fs-button:16px; --fs-input:16px;
+    }
+    body{padding:12px;place-items:start center}
+    .card{grid-template-columns:1fr;gap:20px;padding:32px 18px 20px;border-radius:20px}
+    .intro{display:grid;grid-template-columns:76px 1fr;gap:4px 14px;text-align:left;align-items:center}
+    .avatar-wrap{width:76px;margin:10px 0 0;grid-row:span 2}
+    .avatar{box-shadow:0 0 0 3px var(--soft),0 0 0 4px var(--green);border-width:2px}
+    .bubble{top:-16px;right:auto;left:50%;margin-left:-38px;padding:2px 8px;font-size:13px;border-radius:10px;border-width:1.5px}
+    .bubble::after{left:14px;bottom:-6px;width:9px;height:9px;border-width:1.5px}
+    .tagline{margin:0}
+    .welcome{grid-column:1/-1;max-width:none;margin-top:10px}
+    h2{margin-bottom:14px}
+    .social{grid-template-columns:repeat(3,1fr);gap:8px}
+    .btn-social{flex-direction:column;gap:4px;padding:10px 4px}
+    .or{margin:16px 0 10px}
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<main id="main" class="card">
+  <section class="intro" aria-labelledby="app-title">
+    <div class="avatar-wrap">
+      <img class="avatar" src="avatar.png" alt="">
+      <p class="bubble">Welcome!</p>
+    </div>
+    <h1 id="app-title">JKSpeak</h1>
+    <p class="tagline">Your oral exam practice companion</p>
+    <p class="welcome">Practise oral exam questions out loud or by typing, then review your answers with self-reflection and examiner marks — built for international students.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="login-heading">
+    <h2 id="login-heading">Log in to your account</h2>
+    <form id="login-form" novalidate>
+      <div>
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required>
+      </div>
+      <div>
+        <div class="row">
+          <label for="password">Password</label>
+          <button type="button" class="link caption" id="forgot-btn">Forgot password?</button>
+        </div>
+        <input id="password" name="password" type="password" autocomplete="current-password" required style="margin-top:4px">
+      </div>
+      <button type="submit" class="btn btn-primary">Log in</button>
+    </form>
+
+    <p class="or caption">or continue with</p>
+    <div class="social">
+      <button type="button" class="btn btn-social" data-provider="Google">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.6 12.2c0-.8-.1-1.5-.2-2.2H12v4.2h6a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.2-4.8 3.2-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.4-2.7l-3.6-2.8c-1 .7-2.3 1.1-3.8 1.1-2.9 0-5.4-2-6.3-4.6H2v2.9A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.7 14a6.6 6.6 0 0 1 0-4.2V7H2a11 11 0 0 0 0 9.9z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2 7l3.7 2.9C6.6 7.3 9.1 5.4 12 5.4z"/></svg>
+        Google
+      </button>
+      <button type="button" class="btn btn-social" data-provider="Facebook">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#1877F2"/><path fill="#fff" d="M13.4 23v-8h2.7l.4-3.2h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.6V5.4a22 22 0 0 0-2.4-.1c-2.4 0-4 1.4-4 4.1v2.4H7.5V15h2.7v8z"/></svg>
+        Facebook
+      </button>
+      <button type="button" class="btn btn-social" data-provider="Apple">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#111" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9a4.8 4.8 0 0 0-3.8-2c-1.6-.2-3.1.9-3.9.9s-2-.9-3.4-.9a5 5 0 0 0-4.2 2.6c-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.4.8 2.2-1.3 3.1-2.5a10 10 0 0 0 1.4-2.9 4.4 4.4 0 0 1-2.6-4.1zM13.9 5c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg>
+        Apple
+      </button>
+    </div>
+
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+    <p class="signup">New to JKSpeak? <button type="button" class="link" id="signup-btn">Create an account</button></p>
+  </section>
+</main>
+
+<script>
+  // UI only: no real authentication, no network calls and no storage on this page.
+  const status = document.getElementById('status');
+  const say = (msg) => { status.textContent = 'Note: ' + msg; };
+
+  document.getElementById('login-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    if (!email.value.trim() || !password.value) {
+      say('Please enter your email and password.');
+      (email.value.trim() ? password : email).focus();
+      return;
+    }
+    say('Login is coming soon.');
+  });
+  document.getElementById('forgot-btn').addEventListener('click', () => say('Password recovery is coming soon.'));
+  document.getElementById('signup-btn').addEventListener('click', () => say('Sign up is coming soon.'));
+  document.querySelectorAll('[data-provider]').forEach((b) =>
+    b.addEventListener('click', () => say(b.dataset.provider + ' sign-in is coming soon.')));
+</script>
+</body>
+</html>
