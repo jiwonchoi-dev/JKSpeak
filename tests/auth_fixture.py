@@ -8,7 +8,7 @@ PROFILE = {'version':1, 'displayName':'Test learner', 'course':'Psychology', 'ex
 
 
 def mock_provider(page, immediate_signup=False):
-    state = {'profiles':{USER_A:dict(PROFILE), USER_B:{**PROFILE, 'displayName':'Second learner', 'course':'Chemistry'}}, 'signup':[], 'passwords':[], 'profile_writes':[], 'signup_redirects':[], 'recovery_redirects':[]}
+    state = {'profiles':{USER_A:dict(PROFILE), USER_B:{**PROFILE, 'displayName':'Second learner', 'course':'Chemistry'}}, 'signup':[], 'passwords':[], 'profile_writes':[], 'signup_redirects':[], 'recovery_redirects':[], 'verify':[], 'resend':[]}
     page.route('**/auth-config.json', lambda route: route.fulfill(json={'provider':'supabase','url':'https://jkspeak-test.supabase.co','publishableKey':'sb_publishable_browser_test_only'}))
 
     def respond(route):
@@ -47,6 +47,15 @@ def mock_provider(page, immediate_signup=False):
             else:
                 requested = parse_qs(urlsplit(request.url).query).get('id',[''])[0]
                 route.fulfill(json=[{'learning_profile':state['profiles'][user_id]}] if requested == 'eq.'+user_id and user_id in state['profiles'] else [])
+        elif path == '/auth/v1/verify':
+            state['verify'].append(body)
+            if body.get('token_hash') != 'valid-test-hash':
+                route.fulfill(status=403,json={'error_code':'otp_expired','msg':'Expired test token'})
+            else:
+                route.fulfill(json={'access_token':'access-a','refresh_token':'refresh-test','expires_in':3600,'user':{'id':USER_A,'email':'learner@example.test'}})
+        elif path == '/auth/v1/resend':
+            state['resend'].append(body)
+            route.fulfill(json={})
         elif path in ['/auth/v1/logout','/auth/v1/recover']:
             if path == '/auth/v1/recover': state['recovery_redirects'].append(parse_qs(urlsplit(request.url).query)['redirect_to'][0])
             route.fulfill(json={})

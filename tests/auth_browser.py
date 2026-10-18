@@ -14,7 +14,7 @@ with sync_playwright() as p:
     empty.route('**/auth-config.json',lambda route:route.fulfill(json={'provider':'supabase','url':'','publishableKey':''}))
     empty.goto(BASE+'/signup.html')
     expect(empty.locator('#status')).to_contain_text('not connected')
-    expect(empty.locator('#email')).to_be_disabled()
+    expect(empty.locator('[data-next]')).to_be_disabled()
     assert empty.locator('form').get_attribute('method') == 'post'
     empty.goto(BASE+'/app.html')
     expect(empty).to_have_url(BASE+'/login.html')
@@ -41,16 +41,22 @@ with sync_playwright() as p:
     expect(page.locator('[data-step="1"]')).to_be_visible()
     page.locator('#displayName').fill('New learner')
     page.locator('#course').fill('Biology')
-    page.locator('#examFormat').select_option('viva')
-    page.locator('#focus').select_option('reasoning')
+    page.locator('[data-next]').click()
+    page.locator('[name=examFormat][value=viva]').check()
+    page.locator('[data-next]').click()
+    page.locator('[name=focus][value=reasoning]').check()
+    page.locator('[data-next]').click()
     page.locator('#preferredMinutes').select_option('15')
     page.locator('#weeklyGoal').select_option('4')
+    page.locator('[data-next]').click()
     page.locator('#goal').fill('Defend my evidence clearly')
+    page.locator('[data-next]').click()
     page.locator('[data-next]').last.click()
     expect(page.locator('#profile-review')).to_contain_text('Off')
     page.locator('#privacyAck').check()
     page.get_by_role('button',name='Create my account',exact=True).click()
-    expect(page.locator('#status')).to_contain_text('Check your email')
+    expect(page).to_have_url(BASE+'/confirm-email.html')
+    expect(page.locator('#pending-email')).to_have_text('learner@example.test')
     assert len(state['signup']) == 1
     assert state['signup_redirects'] == [BASE+'/login.html']
     sent=state['signup'][0]
@@ -59,7 +65,6 @@ with sync_playwright() as p:
     assert 'password' not in sent['data']['learning_profile']
     assert page.evaluate('sessionStorage.getItem("jkspeak-auth-session-v1")') is None
     assert not page.evaluate('(password)=>Object.values(localStorage).concat(Object.values(sessionStorage)).join().includes(password)',PASSWORD)
-    expect(page.locator('#password')).to_have_value('')
 
     # Email confirmation callback validates the user and removes URL tokens.
     page.goto(BASE+'/login.html#access_token=access-a&refresh_token=refresh-test&expires_in=3600&type=signup')
@@ -73,7 +78,9 @@ with sync_playwright() as p:
     page.locator('[data-action=settings]').click()
     page.get_by_role('link',name='Edit learning profile').click()
     page.locator('#course').fill('Neuroscience')
+    for _ in range(5): page.locator('[data-next]').click()
     page.locator('#aiConsent').check()
+    page.locator('[data-next]').click()
     page.get_by_role('button',name='Save and continue').click()
     expect(page).to_have_url(BASE+'/app.html')
     expect(page.locator('main h1')).to_contain_text('Your knowledge.')
@@ -122,7 +129,7 @@ with sync_playwright() as p:
 
     # Phone layout and first-visit keyboard access on the integrated pages.
     page.set_viewport_size({'width':390,'height':844})
-    for name in ['','welcome.html','login.html','signup.html','account-privacy.html']:
+    for name in ['','welcome.html','login.html','signup.html','confirm-email.html','account-privacy.html']:
         page.goto(BASE+'/'+name)
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),name
     page.goto(BASE+'/signup.html')
@@ -130,4 +137,4 @@ with sync_playwright() as p:
     page.screenshot(path='/tmp/jkspeak-account-mobile.png',full_page=True)
     assert not errors,errors
     browser.close()
-    print('PASS (mock provider): splash/welcome; guarded app; three-step signup; validation/consent; email confirmation; profile prefill/edit; login errors; account isolation; logout; password recovery/reset; 390px; no password in app storage or URL.')
+    print('PASS (mock provider): splash/welcome; guarded app; sequential signup and review; validation/consent; email confirmation; profile prefill/edit; login errors; account isolation; logout; password recovery/reset; 390px; no password in app storage or URL.')

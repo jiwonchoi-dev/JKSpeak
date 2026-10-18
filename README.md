@@ -14,7 +14,7 @@ The server binds to `127.0.0.1` by default and serves only public app assets, in
 
 ## Entry and accounts
 
-`index.html` / `splash.html` → `welcome.html` → `signup.html` (account, learning profile, review) or `login.html` → `app.html`. Email-confirmation links return to login; a missing profile is completed in `profile.html`. Recovery/reset pages are included. Accounts have separate device-local practice stores, and earlier unassigned data is copied only with explicit confirmation. Never put a service-role/secret key in the public JSON.
+`index.html` / `splash.html` → `welcome.html` → `signup.html` (account → six short profile questions → review → `confirm-email.html`) or `login.html` → `app.html`. All screens share the splash’s 420px canvas, with full-width mobile layout. Email-confirmation links return to login, validate the session and open the app; used/expired links leave login usable with a link to request a fresh email; a missing profile is completed in `profile.html`. Recovery/reset pages are included. Accounts have separate device-local practice stores, and earlier unassigned data is copied only with explicit confirmation. Never put a service-role/secret key in the public JSON.
 
 ## Practice workflow
 
@@ -60,6 +60,8 @@ python3 scripts/serve.py --port 8081
 python3 tests/browser_smoke.py
 python3 tests/deployment_smoke.py
 JKSPEAK_TEST_URL=http://127.0.0.1:8081 python3 tests/auth_browser.py
+JKSPEAK_TEST_URL=http://127.0.0.1:8081 python3 tests/auth_links_browser.py
+JKSPEAK_TEST_URL=http://127.0.0.1:8081 python3 tests/account_layout_browser.py
 python3 tests/profile_rls.py
 ```
 
@@ -69,4 +71,4 @@ Before release, also check keyboard navigation, 200% zoom, PDF extraction, real 
 
 The auth browser tests use intercepted provider responses and synthetic credentials. SQL/RLS tests run real PostgreSQL in an isolated Docker container. Neither proves live Supabase email delivery or a configured production deployment. Keep first-account and real email-delivery checks distinct from provider configuration and mock-flow validation.
 
-Entry scripts/styles carry an `accounts-20261018` URL version to prevent browsers reusing the pre-account app bundle after this rollout. Bump the entry asset version when changing those bundles in a later release.
+Entry scripts/styles carry an `flow-20261018-2` URL version to prevent browsers reusing the pre-account app bundle after this rollout. Bump the entry asset version when changing those bundles in a later release.
