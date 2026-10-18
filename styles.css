@@ -18,3 +18,4 @@ header{height:94px;max-width:1440px;margin:auto;gap:22px}header .brand{font-size
 @media(max-width:760px){.study-companion{width:108px;height:108px}.wizard .aside{padding:22px!important}.hero{padding-top:5px}.exam-mark{width:52px;height:52px}.practice-cycle li{padding:12px}}
 .skip{background:var(--white);color:var(--ink);border:1px solid var(--line)}.mic.live{background:#fff0df;color:#783a20;border-color:#b34425}:root[data-theme=dark] .mic.live{background:#5c3328;color:#ffe2d5;border-color:#efab8d}
 .btn{transition:transform .2s}
+.account-menu{display:flex;align-items:center;gap:8px}.account-menu .status{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.account-menu .btn{font-size:12px;padding:8px 10px}@media(max-width:760px){.account-menu .status{display:none}.account-menu{gap:5px}.account-menu .btn{padding:8px;font-size:11px}}

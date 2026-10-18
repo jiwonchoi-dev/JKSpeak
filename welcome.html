@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Welcome · JKSpeak</title>
-<link rel="icon" href="bee.svg" type="image/svg+xml">
-<link rel="stylesheet" href="auth.css">
+<link rel="icon" href="./jkspeak-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./auth.css">
 <style>
   .hero{position:relative;overflow:hidden;background:var(--hair);border-radius:30px;
     height:min(48vh,380px);display:grid;place-items:center}
@@ -15,7 +15,7 @@
   .lead{margin-bottom:28px}
 </style>
 </head>
-<body class="app">
+<body class="app" data-auth-page="welcome">
 <a class="skip" href="#main">Skip to content</a>
 <main id="main" class="screen">
   <div class="hero" aria-hidden="true">
@@ -34,26 +34,22 @@
       </g>
     </svg>
     <div class="avatar-wrap">
-      <img class="avatar" src="avatar.png" alt="">
+      <img class="avatar" src="./avatar.png" alt="">
       <p class="bubble">Welcome!</p>
     </div>
   </div>
   <section class="text" aria-labelledby="app-title">
     <h1 id="app-title" class="title">JKSpeak</h1>
     <p class="tagline">Your oral exam practice companion</p>
-    <p class="lead muted">Practise oral exam questions out loud or by typing, then review your answers with self-reflection and examiner marks — built for international students.</p>
+    <p class="lead muted">New here? Set up your learning profile. Already have an account? Log in and continue your practice.</p>
     <div class="stack">
       <a class="btn btn-primary" href="login.html">Log in</a>
-      <button type="button" class="btn" id="signup-btn">Create an account</button>
+      <a class="btn" href="./signup.html">Create an account</a>
     </div>
     <p class="status" id="status" role="status" aria-live="polite"></p>
   </section>
 </main>
-<script>
-  // UI only: no storage or network calls.
-  document.getElementById('signup-btn').addEventListener('click', () => {
-    document.getElementById('status').textContent = 'Note: Sign up is coming soon.';
-  });
-</script>
+
+<script type="module" src="./auth-pages.mjs"></script>
 </body>
 </html>

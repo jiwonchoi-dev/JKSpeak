@@ -1,3 +1,47 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#faf8f4"><meta name="description" content="JKSpeak helps you prepare for university oral exams, Viva and presentation Q&A with focused practice and evidence-linked self-review."><title>JKSpeak — Oral Exam Practice</title><link rel="icon" href="./jkspeak-mark.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css"></head>
-<body><a class="skip" href="#main">Skip to content</a><div id="shell"></div><div id="toast" role="status" aria-live="polite" hidden></div><script type="module" src="./app.js"></script></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JKSpeak</title>
+<link rel="icon" href="./jkspeak-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./auth.css">
+<style>
+  .splash{background:var(--hair);display:grid;grid-template-rows:1fr auto;place-items:center;
+    padding:32px 24px 56px;text-align:center}
+  .splash .avatar-wrap{width:min(200px,55vw)}
+  .splash .title{position:relative;z-index:1;color:var(--hair-text);margin-bottom:16px}
+  .pill{position:relative;z-index:1;display:inline-block;font-size:var(--fs-button);font-weight:600;
+    background:rgba(255,254,250,.92);color:var(--hair-text);border:2px solid var(--hair-text);
+    border-radius:999px;padding:10px 26px;text-decoration:none}
+</style>
+</head>
+<body class="app" data-auth-page="splash">
+<a class="skip" href="#main">Skip to content</a><main id="main" tabindex="-1" class="screen splash">
+    <svg class="scenery" viewBox="0 0 480 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g fill="#ffa26e">
+        <circle cx="60" cy="150" r="60"/><circle cx="130" cy="130" r="55"/><circle cx="190" cy="160" r="45"/><rect x="0" y="150" width="235" height="55" rx="27"/>
+        <circle cx="300" cy="80" r="50"/><circle cx="360" cy="55" r="60"/><circle cx="430" cy="85" r="48"/><rect x="250" y="80" width="230" height="52" rx="26"/>
+      </g>
+      <path d="M-20 330 Q240 410 500 330" stroke="#ffd2b6" stroke-width="2" fill="none"/>
+      <g fill="#fff">
+        <path class="twinkle" d="M70 260l5 14 14 5-14 5-5 14-5-14-14-5 14-5z"/>
+        <path class="twinkle" d="M250 190l7 19 19 7-19 7-7 19-7-19-19-7 19-7z"/>
+        <path class="twinkle" d="M410 250l4 11 11 4-11 4-4 11-4-11-11-4 11-4z"/>
+        <path class="twinkle" d="M40 40l4 11 11 4-11 4-4 11-4-11-11-4 11-4z"/>
+        <path class="twinkle" d="M440 420l4 11 11 4-11 4-4 11-4-11-11-4 11-4z"/>
+      </g>
+    </svg>
+  <div class="avatar-wrap">
+    <img class="avatar" src="./avatar.png" alt="">
+    <p class="bubble">Welcome!</p>
+  </div>
+  <div>
+    <h1 class="title">JKSpeak</h1>
+    <a class="pill" href="welcome.html">Get started</a>
+  </div>
+</main>
+
+<script type="module" src="./auth-pages.mjs"></script>
+</body>
+</html>

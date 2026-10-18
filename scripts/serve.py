@@ -7,7 +7,7 @@ from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = {'index.html', 'app.js', 'oral-coach.mjs', 'styles.css', 'bee.svg', 'jkspeak-mark.svg', 'logo.png.png',
-          'scope.html', 'pdf.mjs', 'pdf.worker.mjs', 'PDFJS-LICENSE.txt'}
+          'scope.html', 'app.html', 'splash.html', 'welcome.html', 'login.html', 'signup.html', 'profile.html', 'recover.html', 'reset-password.html', 'account-privacy.html', 'auth.css', 'avatar.png', 'auth-pages.mjs', 'auth-client.mjs', 'auth-config.json', 'profile-fields.mjs', 'learning-profile.mjs', 'account-data.mjs', 'pdf.mjs', 'pdf.worker.mjs', 'PDFJS-LICENSE.txt'}
 
 
 class PublicHandler(SimpleHTTPRequestHandler):

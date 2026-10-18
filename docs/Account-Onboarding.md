@@ -1,0 +1,96 @@
+# JKSpeak 계정·개인화 온보딩 연결
+
+## 구현 범위와 공개 배포 조건
+
+xiulin wang의 PR #1(`fd5024d`)의 splash / welcome / login / avatar / auth.css를 현재 JKSpeak에 통합했다. 원래 PR의 ‘coming soon’ 동작 대신 Supabase 이메일/비밀번호 인증과 학습 프로필 저장을 연결한다. 미지원 소셜 로그인 버튼을 실제 로그인처럼 표시하지 않는다.
+
+현재 `auth-config.json`은 빈 공개 설정이다. 실제 Supabase 프로젝트가 연결되기 전에는 가입/로그인 입력을 비활성화하고, 존재하지 않는 계정 생성이나 성공을 보여주지 않는다. 기존 라이브 앱을 사용할 수 없게 만들지 않도록, 설정·SQL·실제 이메일 검증 전에는 계정 게이트 변경을 `main`에 배포하지 않는다.
+
+## 화면 이동
+
+- 첫 방문 `/`(`index.html`, splash와 동일): 캐릭터 시작 화면 → `welcome.html`.
+- 환영: 처음이면 `signup.html`, 기존 계정이면 `login.html`.
+- 가입: ① 이메일·비밀번호 ② 학습 프로필 ③ 내용 확인·정보 사용 고지 확인.
+- 이메일 확인 필요: 계정이 생성돼도 메인으로 보내지 않고 확인 메일 안내 → `login.html`에서 링크 확인 → 메인.
+- 확인이 불필요한 설정이면 실제 인증 세션을 받은 뒤 메인으로 이동.
+- 로그인: Supabase 인증 → 프로필 조회 → `app.html`. 프로필이 없는 기존 회원은 `profile.html`을 먼저 완료.
+- 이미 로그인한 사용자가 시작/환영/로그인 페이지를 열면 메인으로 이동.
+- 메인 직접 접속은 유효한 인증을 확인하며, 로그아웃 상태에서는 로그인 페이지로 이동.
+- 비밀번호 복구: `recover.html` → 이메일 → `reset-password.html` → 비밀번호 변경 후 재로그인.
+
+## 수집 정보와 사용
+
+| 정보 | 필요성 | 사용 |
+|---|---|---|
+| 이메일·비밀번호 | 계정 필수 | Supabase Auth 인증. 비밀번호를 프로필·AI 문맥·앱 저장소에 넣지 않음 |
+| 사용할 이름 | 프로필 필수 | 인사·연습 준비. 법적 이름을 요구하지 않음 |
+| 과목 | 프로필 필수 | 새 연습의 기본 과목 |
+| 시험 유형 | 기본 선택 | University Oral / Viva / Presentation Q&A |
+| 자기보고 영어 수준 | 기본 ‘모름’ 가능 | 안내 난이도의 향후 입력. 공식 평가로 사용하지 않음 |
+| 집중할 기술 | 기본 선택 | 구조·근거·추론·관련성 중 초기 연습 목표 |
+| 답변 방식·연습 시간·주간 목표 | 기본 선택 | 직접 입력/말하기 선호와 세션 기본값 |
+| 시간대 | 브라우저 값, 변경 가능 | 향후 일정·연습 계획 |
+| 시험일·구체적 목표·어려운 점 | 선택 | 향후 학습 계획과 개인화 |
+| AI 개인화 동의 | 선택, 기본 꺼짐 | 향후 연결된 AI 기능에서 학습 문맥을 활용할지 여부 |
+
+생년월일·주소·학생번호·성적·국적·건강정보는 요구하지 않는다. `buildAgentContext()`는 명시적으로 동의한 경우에만 학습 필드를 반환하고 이메일·비밀번호·토큰·계정 ID·표시 이름을 제외한다. 이 함수 자체는 AI에 전송하지 않으며 AI 제공자는 여전히 미연결이다. 과목/유형/집중 기술/연습 시간/주간 목표는 실제 앱 기본값에 반영한다.
+
+## 1. Supabase 프로젝트 생성과 SQL
+
+1. Supabase에서 본인 프로젝트를 생성한다. 데이터 지역·플랜·보관 정책은 프로젝트 소유자가 선택한다.
+2. SQL Editor에서 [202610180001_learning_profiles.sql](../supabase/migrations/202610180001_learning_profiles.sql)의 전체 내용을 실행한다.
+3. 이 SQL은 계정별 `learning_profiles` 테이블, 회원 본인만 조회·추가·수정 가능한 RLS, 가입 시 프로필 생성 트리거, 서버 시간 기록을 만든다. 로그인 권한을 클라이언트의 `role` 값으로 부여하지 않는다. 계정 삭제 시 프로필도 삭제된다.
+4. Supabase Auth에서 이메일/비밀번호 가입을 활성화하고 최소 비밀번호 길이를 **12자 이상**으로 설정한다. 이 앱은 12자 미만의 새 비밀번호를 받지 않는다.
+5. 이메일 확인은 활성화하는 것을 권장한다. 실제 친구들 이메일로 가입하려면 SMTP 발송 설정도 확인한다. Supabase 기본 메일 발송은 수신자·속도 제한이 있으므로 외부 가입자에게 확인 메일이 전달되는지 반드시 검증한다. 메일 미도착을 우회하려고 검증을 임의로 해제하지 않는다.
+
+## 2. 주소와 이메일 리디렉션
+
+Auth URL Configuration의 Site URL:
+
+`https://jiwonchoi-dev.github.io/JKSpeak/`
+
+Redirect URLs에 정확한 주소를 추가한다:
+
+```
+https://jiwonchoi-dev.github.io/JKSpeak/login.html
+https://jiwonchoi-dev.github.io/JKSpeak/reset-password.html
+```
+
+Netlify를 같이 사용하면 해당 사이트의 `/login.html`, `/reset-password.html`도 추가한다. 로컬 수동 검증용 `http://127.0.0.1:8080/login.html`, `http://127.0.0.1:8080/reset-password.html`은 필요할 때만 등록한다. 불필요한 전체 wildcard는 사용하지 않는다. 모든 내부 정적 파일은 상대 경로라 `/JKSpeak/`와 `/`를 모두 지원한다.
+
+## 3. 공개 클라이언트 설정
+
+Project URL과 **publishable key**(또는 레거시 `anon` 공개 키)를 `auth-config.json`의 `url`, `publishableKey`에 입력한다. 이 파일은 웹에 공개되는 설정이다. **`service_role`, `sb_secret_...`, DB 비밀번호를 절대로 넣지 않는다.**
+
+또는 환경 변수 `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`를 설정한 뒤:
+
+```sh
+python3 scripts/configure_auth.py
+```
+
+이 도구는 비밀/관리자 키를 거절하고 값은 출력하지 않는다. GitHub Pages는 실행 시 환경 변수를 주입하지 않으므로, 검증된 공개 JSON 파일을 배포 결과물에 포함해야 한다. 비밀키를 JS에 넣는 방법으로 연결하지 않는다.
+
+## 데이터 보존·접근
+
+인증 토큰은 탭의 sessionStorage에만 보관하고 로그아웃 시 제거한다. 토큰이 들어온 이메일 링크의 URL fragment는 즉시 지우고 Supabase에서 사용자를 검증한다. 실제 비밀번호는 인증 요청 외의 저장·프로필·로그에 넣지 않는다. 폼은 인증 초기화 전에는 비활성화하고 POST method를 명시하여 JS가 로드되기 전에 비밀번호가 URL query로 제출되지 않게 한다.
+
+가입 프로필은 초기 계정 metadata로 전달되어 DB 트리거로 저장된다. 현재 프로필과 동의 변경은 `learning_profiles`를 기준으로 하며, 과거 가입 metadata로 동의를 추정하지 않는다. 계정 삭제 요청은 프로젝트 소유자가 처리해야 하며, 이 릴리스는 셀프서비스 계정 전체 삭제를 주장하지 않는다.
+
+학습 텍스트는 `jkspeak-practice-v2:<verified-user-id>`, 녹음은 `jkspeak-audio-v2:<verified-user-id>`로 분리한다. Supabase에는 아직 연습/녹음을 동기화하지 않는다. 같은 브라우저 프로필에 접근할 수 있는 사람에 대한 디스크 암호화를 제공하지 않는다.
+
+기존 `bee-independent-v1` / `bee-audio-v1`는 삭제하지 않는다. Settings에서 본인 데이터임을 명시적으로 확인한 경우에만 기존 기록과 해당 녹음을 계정에 복사한다. 현재 계정의 같은 ID 기록·녹음을 덮어쓰지 않으며 원본은 보존한다. 계정별 로컬 삭제는 다른 계정·서버 프로필·이전 미할당 데이터에 영향을 주지 않는다.
+
+## 검증과 남은 실행 조건
+
+```sh
+node --test tests/learning-profile.test.mjs tests/oral-coach.test.mjs
+python3 scripts/serve.py --port 8083
+JKSPEAK_TEST_URL=http://127.0.0.1:8083 python3 tests/auth_browser.py
+JKSPEAK_TEST_URL=http://127.0.0.1:8083 python3 tests/browser_smoke.py
+python3 tests/deployment_smoke.py
+python3 tests/profile_rls.py
+```
+
+Auth 브라우저 테스트는 가로챈 Supabase 응답으로 가입/확인/로그인/복구/메인 이동을 검증한다. 실제 이메일 발송이나 실제 Supabase 가입을 검증한 것으로 표현하지 않는다. RLS 테스트는 Docker `postgres:17-alpine`의 격리된 PostgreSQL에서 SQL을 실제 실행하여 본인 접근·타인 접근 거절·익명 접근 거절·계정 삭제 cascade를 검사한다. 이 테스트는 Supabase의 Auth 메일 파이프라인 검증을 대체하지 않는다.
+
+실제 프로젝트 생성, SQL 적용, 공개 키 연결, 외부 이메일 확인/비밀번호 복구, 서로 다른 실제 계정 간 프로필 접근 거절을 검증한 뒤에만 `main`에 적용하고 공개 배포한다.

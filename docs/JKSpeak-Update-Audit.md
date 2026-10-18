@@ -56,3 +56,7 @@ Light CTA에는 흰 글씨, Dark CTA에는 Ink 글씨를 쓴다. 기존 Bee 기�
 - `python3 tests/deployment_smoke.py`: 루트 및 `/JKSpeak/`에서 앱·scope·CSS·이미지·모듈·PDF worker·skip link.
 - `JKSPEAK_TEST_URL=http://127.0.0.1:8082 python3 tests/browser_smoke.py`: TXT/PDF, Guided/Mock, 중단 복구, 자기점검, 시험관 채점, 재도전·전이·후속 질문, 자신감/목표 저장, 다크 모드, 내보내기, 마이크 거절, 합성 마이크 녹음/재생/삭제, 모바일, 전체 데이터 삭제.
 - 실제 마이크 품질·받아쓰기 정확도·Safari/Firefox·공개 Pages의 최신 배포 응답은 별도 확인 대상이다. 네트워크 정책상 라이브 사이트나 배포 상태를 읽지 못하면 확인했다고 표현하지 않는다.
+
+## 후속 계정 온보딩 작업
+
+xiulin wang의 PR #1을 바탕으로 실제 Supabase 인증 어댑터, 가입 학습 프로필, 계정별 로컬 데이터 분리를 추가한 기능 브랜치를 준비했다. 위 표의 계정 ‘미연결’은 실제 서비스 연결이 아직 필요하다는 뜻이며, 새로운 코드의 상세 범위와 활성화 조건은 [Account-Onboarding.md](Account-Onboarding.md)를 따른다. 프로젝트 URL·공개 키·SQL·이메일 검증 전에는 라이브 가입이 준비됐다고 표현하지 않는다.

@@ -5,6 +5,7 @@ import runpy
 from http.server import ThreadingHTTPServer
 from threading import Thread
 from playwright.sync_api import sync_playwright, expect
+from auth_fixture import mock_provider, seed_account
 
 PublicHandler = runpy.run_path(str(Path(__file__).resolve().parents[1] / 'scripts/serve.py'))['PublicHandler']
 
@@ -32,6 +33,8 @@ with sync_playwright() as p:
         origin = f'http://127.0.0.1:{server.server_port}'
         base = origin + prefix + '/'
         page = browser.new_page()
+        mock_provider(page)
+        seed_account(page)
         errors, failures = [], []
         page.on('pageerror', lambda e: errors.append(str(e)))
         page.on('response', lambda r: failures.append(r.url) if r.status >= 400 else None)

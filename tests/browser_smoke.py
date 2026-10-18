@@ -2,6 +2,7 @@
 import json
 import os
 from playwright.sync_api import sync_playwright, expect
+from auth_fixture import mock_provider, seed_account, USER_A
 
 BASE = os.environ.get('JKSPEAK_TEST_URL', 'http://127.0.0.1:8081')
 
@@ -22,11 +23,13 @@ def text_pdf():
 with sync_playwright() as p:
     browser = p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH', '/usr/bin/chromium'), args=['--no-sandbox'])
     page = browser.new_page()
+    mock_provider(page)
+    seed_account(page)
     page.set_default_timeout(8000)
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.on('dialog', lambda dialog: dialog.accept())
-    page.goto(BASE + "/")
+    page.goto(BASE + "/app.html")
     for route in ['/', '/app.js', '/oral-coach.mjs', '/pdf.mjs', '/pdf.worker.mjs', '/scope.html']:
         assert page.request.get(BASE + route).status == 200, route
     assert page.request.get(BASE + '/.git/HEAD').status == 404
@@ -35,6 +38,8 @@ with sync_playwright() as p:
     legacy = {'id':'legacy', 'course':'Legacy course', 'role':'student', 'questions':[{'question':'Old question', 'topic':'Old topic'}], 'answers':[{'text':'Keep this answer', 'reflection':'Keep this note', 'needsWork':False}], 'elapsed':42, 'ended':'2026-10-17T00:00:00Z', 'feedback':None}
     page.evaluate('(s)=>localStorage.setItem("bee-independent-v1",JSON.stringify(s))', {'draft':{'name':'Existing learner'}, 'history':[legacy]})
     page.reload()
+    page.locator('[data-action=settings]').click()
+    page.locator('[data-action=import-legacy]').click()
     page.locator('[data-action=demo]').click()
     page.locator('#confidence').select_option('2')
     page.locator('#format').select_option('viva')
@@ -91,15 +96,15 @@ with sync_playwright() as p:
     expect(page.locator('.skill-grid')).to_contain_text('1 uncertain')
     expect(page.locator('main')).to_contain_text('2 → 4')
     expect(page.locator('.weekly-plan')).to_contain_text('Try the same skill on a different question.')
-    assert page.evaluate('JSON.parse(localStorage.getItem("bee-independent-v1")).history.find(s=>s.id==="legacy").answers[0].text') == 'Keep this answer'
+    assert page.evaluate('JSON.parse(localStorage.getItem("jkspeak-practice-v2:11111111-1111-4111-8111-111111111111")).history.find(s=>s.id==="legacy").answers[0].text') == 'Keep this answer'
 
     # Appearance persists; export includes original data and excludes recordings.
     page.locator('[data-action=settings]').click()
     page.locator('#theme').select_option('dark')
     page.locator('#weeklyGoal').select_option('4')
     page.reload()
-    assert page.locator('html').get_attribute('data-theme') == 'dark'
-    assert page.evaluate('JSON.parse(localStorage.getItem("bee-independent-v1")).settings.weeklyGoal') == 4
+    expect(page.locator('html')).to_have_attribute('data-theme', 'dark')
+    assert page.evaluate('JSON.parse(localStorage.getItem("jkspeak-practice-v2:11111111-1111-4111-8111-111111111111")).settings.weeklyGoal') == 4
     page.locator('[data-action=settings]').click()
     with page.expect_download() as download:
         page.locator('[data-action=export-all]').click()
@@ -125,18 +130,21 @@ with sync_playwright() as p:
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     page.screenshot(path='/tmp/jkspeak-mobile-practice.png', full_page=True)
     page.locator('[data-action=settings]').click()
-    page.evaluate('''async()=>{const db=await new Promise((ok,fail)=>{const r=indexedDB.open('bee-audio-v1',1);r.onupgradeneeded=()=>r.result.createObjectStore('recordings');r.onsuccess=()=>ok(r.result);r.onerror=()=>fail(r.error)});await new Promise((ok,fail)=>{const t=db.transaction('recordings','readwrite');t.objectStore('recordings').put(new Blob(['test']),'test:0');t.oncomplete=ok;t.onerror=fail});db.close()}''')
+    page.evaluate('''async()=>{const db=await new Promise((ok,fail)=>{const r=indexedDB.open('jkspeak-audio-v2:11111111-1111-4111-8111-111111111111',1);r.onupgradeneeded=()=>r.result.createObjectStore('recordings');r.onsuccess=()=>ok(r.result);r.onerror=()=>fail(r.error)});await new Promise((ok,fail)=>{const t=db.transaction('recordings','readwrite');t.objectStore('recordings').put(new Blob(['test']),'test:0');t.oncomplete=ok;t.onerror=fail});db.close()}''')
     page.locator('[data-action=clear-all]').click()
     expect(page.locator('#toast')).to_contain_text('have been deleted')
-    assert page.evaluate('localStorage.getItem("bee-independent-v1")') is None
-    assert page.evaluate('''async()=>{const db=await new Promise(ok=>{const r=indexedDB.open('bee-audio-v1',1);r.onsuccess=()=>ok(r.result)});const count=await new Promise(ok=>{const r=db.transaction('recordings').objectStore('recordings').count();r.onsuccess=()=>ok(r.result)});db.close();return count}''') == 0
+    assert page.evaluate('localStorage.getItem("jkspeak-practice-v2:11111111-1111-4111-8111-111111111111")') is None
+    assert page.evaluate('JSON.parse(localStorage.getItem("bee-independent-v1")).history[0].id') == 'legacy'
+    assert page.evaluate('''async()=>{const db=await new Promise(ok=>{const r=indexedDB.open('jkspeak-audio-v2:11111111-1111-4111-8111-111111111111',1);r.onsuccess=()=>ok(r.result)});const count=await new Promise(ok=>{const r=db.transaction('recordings').objectStore('recordings').count();r.onsuccess=()=>ok(r.result)});db.close();return count}''') == 0
     assert not errors, errors
     browser.close()
     # Synthetic microphone checks the real MediaRecorder/IndexedDB path.
     audio_browser = p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH', '/usr/bin/chromium'), args=['--no-sandbox', '--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'])
     audio_page = audio_browser.new_page()
+    mock_provider(audio_page)
+    seed_account(audio_page)
     audio_page.on('dialog', lambda dialog: dialog.accept())
-    audio_page.goto(BASE + "/")
+    audio_page.goto(BASE + "/app.html")
     audio_page.locator('[data-action=demo]').click()
     for _ in range(4):
         audio_page.locator('button[type=submit]').click()
@@ -146,7 +154,7 @@ with sync_playwright() as p:
     audio_page.locator('[data-action=record]').click()
     expect(audio_page.locator('#recording audio')).to_be_visible()
     audio_page.locator('#recording audio').evaluate('async audio=>{await audio.play();audio.pause();}')
-    assert audio_page.evaluate('''async()=>{const state=JSON.parse(localStorage.getItem('bee-independent-v1'));const db=await new Promise(ok=>{const r=indexedDB.open('bee-audio-v1',1);r.onsuccess=()=>ok(r.result)});const size=await new Promise(ok=>{const r=db.transaction('recordings').objectStore('recordings').get(state.active.id+':0');r.onsuccess=()=>ok(r.result.size)});db.close();return size}''') > 0
+    assert audio_page.evaluate('''async()=>{const state=JSON.parse(localStorage.getItem('jkspeak-practice-v2:11111111-1111-4111-8111-111111111111'));const db=await new Promise(ok=>{const r=indexedDB.open('jkspeak-audio-v2:11111111-1111-4111-8111-111111111111',1);r.onsuccess=()=>ok(r.result)});const size=await new Promise(ok=>{const r=db.transaction('recordings').objectStore('recordings').get(state.active.id+':0');r.onsuccess=()=>ok(r.result.size)});db.close();return size}''') > 0
     audio_page.get_by_role('button', name='Delete recording', exact=True).click()
     expect(audio_page.locator('#recording audio')).to_have_count(0)
     audio_browser.close()
