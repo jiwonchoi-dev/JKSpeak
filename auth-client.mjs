@@ -140,10 +140,19 @@ export async function resendConfirmation(email){
   await request('/auth/v1/resend?redirect_to='+encodeURIComponent(appURL('login.html')),{method:'POST',body:{type:'signup',email:email.trim()}});
 }
 
-export async function requireAccount(){
+// Guest access is local-only. It never assumes a Supabase account or uploads practice.
+export async function requireAccount({allowGuest=false}={}){
   const user=await account();
-  if(!user){location.replace(appURL('login.html'));return null;}
+  if(!user){
+    if(allowGuest)return {guest:true,user:{id:'guest-local'},profile:{
+      version:1,displayName:'Guest',course:'My subject',examFormat:'oral',
+      englishLevel:'unsure',focus:'evidence',preferredMinutes:10,weeklyGoal:3,
+      answerPreference:'both',examDate:'',goal:'',challenges:[],
+      timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC',aiConsent:false
+    }};
+    location.replace(appURL('login.html'));return null;
+  }
   const learning=await profile();
   if(!learning){location.replace(appURL('profile.html'));return null;}
-  return {user,profile:learning};
+  return {guest:false,user,profile:learning};
 }
