@@ -68,3 +68,5 @@ The test defaults to `/usr/bin/chromium`; set `CHROMIUM_PATH` for another instal
 Before release, also check keyboard navigation, 200% zoom, PDF extraction, real microphone playback/deletion, transcription errors and Safari/Firefox. Do not commit recordings, study data or credentials. Source changes do not automatically update the hosted deployment. See CONTRIBUTING.md for collaboration requirements.
 
 The auth browser tests use intercepted provider responses and synthetic credentials. SQL/RLS tests run real PostgreSQL in an isolated Docker container. Neither proves live Supabase email delivery or a configured production deployment. Keep first-account and real email-delivery checks distinct from provider configuration and mock-flow validation.
+
+Entry scripts/styles carry an `accounts-20261018` URL version to prevent browsers reusing the pre-account app bundle after this rollout. Bump the entry asset version when changing those bundles in a later release.

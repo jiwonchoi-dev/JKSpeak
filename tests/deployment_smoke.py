@@ -41,7 +41,7 @@ with sync_playwright() as p:
         page.goto(base)
         expect(page.locator('main h1')).to_contain_text('Your knowledge.')
         page.wait_for_function('document.querySelector(".brand img").naturalWidth > 0')
-        assert page.locator('link[rel=stylesheet]').evaluate('(e)=>e.href') == base + 'styles.css'
+        assert page.locator('link[rel=stylesheet]').evaluate('(e)=>e.href').split('?')[0] == base + 'styles.css'
         skip = page.locator('.skip')
         assert skip.bounding_box()['y'] + skip.bounding_box()['height'] <= 0
         page.keyboard.press('Tab')
