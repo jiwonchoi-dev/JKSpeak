@@ -1,4 +1,4 @@
-import {validateProfile} from './learning-profile.mjs?v=flow-20261018-2';
+import {validateProfile} from './learning-profile.mjs?v=flow-20261018-3';
 
 const sessionKey='jkspeak-auth-session-v1';
 let configPromise;

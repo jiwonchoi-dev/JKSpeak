@@ -9,6 +9,8 @@ with sync_playwright() as p:
     for suffix in ['#error=access_denied&error_code=otp_expired&error_description=expired','?error=access_denied&error_description=expired','#access_token=invalid&refresh_token=invalid']:
         page=browser.new_page()
         mock_provider(page)
+        page.goto(BASE+'/login.html')
+        expect(page.locator('#email')).to_be_enabled()
         page.goto(BASE+'/login.html'+suffix)
         expect(page.locator('#status')).to_contain_text('used or expired')
         expect(page.locator('#email')).to_be_enabled()

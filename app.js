@@ -1,7 +1,7 @@
-import {formats, skills, practicePlan, comparison, validQuote, followUpPrompt, weeklySummary} from './oral-coach.mjs?v=flow-20261018-2';
-import {requireAccount, logout} from './auth-client.mjs?v=flow-20261018-2';
-import {practiceStorageKey, audioDatabaseName, buildAgentContext} from './learning-profile.mjs?v=flow-20261018-2';
-import {legacyPractice, importLegacyPractice} from './account-data.mjs?v=flow-20261018-2';
+import {formats, skills, practicePlan, comparison, validQuote, followUpPrompt, weeklySummary} from './oral-coach.mjs?v=flow-20261018-3';
+import {requireAccount, logout} from './auth-client.mjs?v=flow-20261018-3';
+import {practiceStorageKey, audioDatabaseName, buildAgentContext} from './learning-profile.mjs?v=flow-20261018-3';
+import {legacyPractice, importLegacyPractice} from './account-data.mjs?v=flow-20261018-3';
 const identity=await requireAccount().catch(error=>{
   const shell=document.getElementById('shell');shell.replaceChildren();const main=document.createElement('main');main.id='main';const message=document.createElement('p');message.textContent=error.message;const retry=document.createElement('a');retry.href='./login.html';retry.textContent='Return to login';main.append(message,retry);shell.append(main);return null;
 });

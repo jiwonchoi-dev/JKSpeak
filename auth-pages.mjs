@@ -1,6 +1,6 @@
-import * as auth from './auth-client.mjs?v=flow-20261018-2';
-import {profileQuestions,readProfile,formatNames,focusNames,answerNames,challengeNames} from './profile-fields.mjs?v=flow-20261018-2';
-import {validateProfile} from './learning-profile.mjs?v=flow-20261018-2';
+import * as auth from './auth-client.mjs?v=flow-20261018-3';
+import {profileQuestions,readProfile,formatNames,focusNames,answerNames,challengeNames} from './profile-fields.mjs?v=flow-20261018-3';
+import {validateProfile} from './learning-profile.mjs?v=flow-20261018-3';
 
 const $=selector=>document.querySelector(selector);
 const kind=document.body.dataset.authPage;
@@ -73,7 +73,7 @@ function setupResend(){
 }
 function setupReset(enabled){const form=$('#reset-form');if(enabled)unlock(form);form.elements.confirmPassword.oninput=()=>form.elements.confirmPassword.setCustomValidity('');form.elements.password.oninput=()=>form.elements.confirmPassword.setCustomValidity('');form.onsubmit=event=>{event.preventDefault();const confirm=form.elements.confirmPassword;confirm.setCustomValidity(confirm.value===form.elements.password.value?'':'The passwords do not match.');if(!confirm.reportValidity())return;const password=form.elements.password.value;action(form,async()=>{await auth.updatePassword(password);form.reset();await auth.logout();go('login.html');});};}
 function verificationButton(){
- let button=$('#verify-email-link');if(!button){button=document.createElement('button');button.type='button';button.className='btn btn-primary';button.textContent=kind==='reset'?'Confirm password reset':'Confirm my email';$('.flow-heading').after(button);}
+ let button=$('#verify-email-link');if(!button){button=document.createElement('button');button.id='verify-email-link';button.type='button';button.className='btn btn-primary';button.textContent=kind==='reset'?'Confirm password reset':'Confirm my email';$('.flow-heading').after(button);}
  button.hidden=false;if(kind==='confirm'){$('#confirmation-heading').textContent='Confirm your email address.';$('#confirmation-copy').textContent='Select the button below to finish confirmation securely on this device.';$('.flow-actions .btn').classList.remove('btn-primary');}
  button.onclick=async()=>{button.disabled=true;say('Confirming your email…');try{await auth.verifyEmailLink();if(kind==='reset'){button.hidden=true;setupReset(true);say('Link confirmed. Choose your new password.');}else await signedIn();}catch(error){say(error.status===400||error.status===403?'This link may have been used or expired. Try logging in or request a new confirmation email.':error.message,true);button.disabled=false;}};
 }
@@ -101,3 +101,6 @@ async function init(){
  if(kind==='reset'){let user;try{user=await auth.account();}catch(error){say(error.message,true);}setupReset(Boolean(user));if(!user&&!callbackError)say('Open your latest recovery email link first. You can request another from the login page.',true);}
 }
 init().catch(error=>say(error.message,true));
+// Following another email link in an already-open callback page can change only
+// the fragment, without loading the module again.
+window.addEventListener('hashchange',()=>{if(['login','confirm','reset'].includes(kind))init().catch(error=>say(error.message,true));});
