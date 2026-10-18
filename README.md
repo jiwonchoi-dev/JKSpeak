@@ -16,6 +16,13 @@ The server binds to `127.0.0.1` by default and serves only public app assets, in
 
 `index.html` / `splash.html` → `welcome.html` → `signup.html` (account → six short profile questions → review → `confirm-email.html`) or `login.html` → `app.html`. All screens share the splash’s 420px canvas, with full-width mobile layout. Email-confirmation links return to login, validate the session and open the app; used/expired links leave login usable with a link to request a fresh email; a missing profile is completed in `profile.html`. Recovery/reset pages are included. Accounts have separate device-local practice stores, and earlier unassigned data is copied only with explicit confirmation. Never put a service-role/secret key in the public JSON.
 
+
+## Guest-first voice practice
+
+The public splash now opens a single **Next** welcome action leading directly to `app.html`, without requiring signup. Guest sessions and recordings use the separate `guest-local` browser stores; previously authenticated accounts retain their existing account-specific stores and can still sign in from the app header. Guest work is not automatically migrated to a newly signed-in account; use a local export to back it up before switching browser profiles. No practice data is uploaded on the guest path. The existing Supabase authentication routes are retained for opt-in account use.
+
+During an oral session, select **Voice-only view** to use the avatar-based layout from `TT.png`. Play questions through browser speech synthesis, record locally via `MediaRecorder`, use optional browser dictation, or type an answer. Recording-only answers count toward the completed-answer tally. This is a user-controlled voice interface, **not** an AI examiner or an automatically generated spoken conversation.
+
 ## Practice workflow
 
 - Choose an exam format, one focus skill and Guided (optional hints/notes) or Mock (no hints/notes).

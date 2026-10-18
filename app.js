@@ -1,5 +1,5 @@
 import {formats, skills, practicePlan, comparison, validQuote, followUpPrompt, weeklySummary} from './oral-coach.mjs?v=mail-20261018-4';
-import {requireAccount, logout} from './auth-client.mjs?v=mail-20261018-4';
+import {requireAccount, logout} from './auth-client.mjs?v=guest-voice-20261018-1';
 import {practiceStorageKey, audioDatabaseName, buildAgentContext} from './learning-profile.mjs?v=mail-20261018-4';
 import {legacyPractice, importLegacyPractice} from './account-data.mjs?v=mail-20261018-4';
 const identity=await requireAccount({allowGuest:true}).catch(error=>{

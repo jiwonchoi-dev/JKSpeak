@@ -22,3 +22,25 @@ header{height:94px;max-width:1440px;margin:auto;gap:22px}header .brand{font-size
 /* Match the entry canvas on every app page, including desktop screens. */
 body{max-width:420px;margin:24px auto;background:var(--white);border:1px solid var(--line);border-radius:40px;min-height:800px;position:relative}header{height:auto;min-height:112px;padding:20px 20px 0;gap:10px;flex-wrap:wrap}.brand{flex:1}header .brand{font-size:21px}header .brand img{width:40px;height:40px}nav{order:3;width:100%;justify-content:space-between;gap:8px}nav button{font-size:12px;padding:12px 3px;min-height:44px}.account-menu .status{display:none}.account-menu{gap:5px}.account-menu .btn{padding:8px;font-size:11px}main{max-width:420px;padding:24px;min-height:0}.hero,.form-layout,.exam-grid,.grid,.grid.skill-grid,.two{grid-template-columns:1fr}.hero{gap:24px;padding:4px 0 24px}.hero h1{font-size:42px}.hero .lead{font-size:14px}.today-card{padding:24px}.today-card h2{font-size:28px}.hero-cta .btn{width:100%}.hero-proof{flex-wrap:wrap}.card{padding:20px}.card.feature{min-height:0;display:flex}.feature .number{margin-bottom:12px}.section-head h2{font-size:25px}.wizard .aside{padding:20px!important}.step{font-size:10px;padding:12px 2px}.step span{display:block;margin:0 0 8px}.result-hero{grid-template-columns:1fr}.result-hero h1{font-size:39px}.history-item{align-items:start;flex-direction:column}.history-item .row{width:100%}.review-actions{align-items:stretch}.review-actions .btn{width:100%}.question-card h2{font-size:27px}footer{padding:20px 24px;flex-direction:column;gap:8px}.btn.small{min-height:44px}.form-foot{margin-top:24px;gap:12px}.form-foot .btn{padding:12px;font-size:12px}.how{max-width:420px}.how h1{font-size:40px}.how h2{font-size:26px}.how p{font-size:14px}
 @media(max-width:460px){body{margin:0;max-width:100%;border:0;border-radius:0;min-height:100dvh}}
+
+
+/* Voice-first oral practice: follows TT.png without using the mockup as a flat UI. */
+.voice-room{max-width:840px;margin:12px auto 32px;padding:clamp(18px,4vw,42px);border-radius:28px;background:linear-gradient(155deg,#fff0ba 0%,#fff8df 64%,#fffaf0 100%);color:#222233;text-align:center;box-shadow:0 16px 40px rgba(82,59,39,.07)}
+.voice-top,.voice-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.voice-room .progress{margin:18px auto;max-width:620px}
+.voice-portrait{width:min(250px,62vw);aspect-ratio:1;margin:32px auto 24px;border:7px solid #fff;border-radius:50%;background:#ffe68c;display:grid;place-items:center;overflow:hidden;box-shadow:0 0 0 1px rgba(142,123,70,.1),0 12px 24px rgba(83,67,26,.12);transition:box-shadow .2s,transform .2s}
+.voice-portrait img{height:100%;width:100%;object-fit:cover}
+.voice-portrait.voice-speaking{box-shadow:0 0 0 20px rgba(255,153,72,.18),0 0 0 38px rgba(255,153,72,.09)}
+.voice-portrait.voice-listening{box-shadow:0 0 0 7px #8eab81,0 0 0 20px rgba(142,171,129,.15)}
+.voice-kicker{font-weight:800;letter-spacing:.14em;font-size:.7rem;color:#665443}
+.voice-question{max-width:580px;margin:12px auto 10px;color:#242534;font-size:clamp(1.35rem,3vw,1.9rem);line-height:1.35}
+.voice-state{min-height:42px;color:#5c594c;font-size:.88rem}
+.voice-actions{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;margin:22px auto}
+.voice-actions .btn.primary{background:#ff6b2a;color:white;border-radius:999px;min-height:54px;font-weight:800}
+.voice-room .recording{max-width:520px;margin:12px auto}
+.voice-transcript{max-width:600px;margin:24px auto 20px;text-align:left}
+.voice-transcript label{font-weight:700;color:#242534}
+.voice-transcript .answer-area{min-height:110px;background:#fffef7}
+.voice-bottom{border-top:1px solid rgba(81,73,48,.18);padding-top:20px}
+@media(max-width:620px){.voice-room{margin:0 -8px;padding:22px 14px;border-radius:20px}.voice-top,.voice-bottom{justify-content:center}.voice-actions .btn{flex:1 1 120px}.voice-actions .btn.primary{flex:1 1 100%}}
+@media(prefers-reduced-motion:reduce){.voice-portrait{transition:none}}
